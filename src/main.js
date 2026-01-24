@@ -7,16 +7,19 @@ import {
     clearGallery,
     showLoader,
     hideLoader,
+    showLoadMoreButton,
+    hideLoadMoreButton,
 } from "./js/render-functions.js";
 
 const form = document.querySelector(".form");
-const loadMoreBtn = document.querySelector(".load-more");
 let query = "";
 let page = 1;
 const PER_PAGE = 15;
 
 form.addEventListener("submit", onFormSubmit);
-loadMoreBtn.addEventListener("click", onLoadMore);
+document
+    .querySelector(".load-more")
+    .addEventListener("click", onLoadMore);
 
 async function onFormSubmit(event) {
     event.preventDefault();
@@ -25,12 +28,13 @@ async function onFormSubmit(event) {
     
     page = 1;
     clearGallery();
-
+    hideLoadMoreButton();
     await fetchImages();
 }
 
 async function onLoadMore() {
     page += 1;
+    hideLoadMoreButton();
     await fetchImages();
 }
 
@@ -47,12 +51,12 @@ async function fetchImages() {
         createGallery(data.hits);
         const totalPages = Math.ceil(data.totalHits / PER_PAGE);
         if (page >= totalPages) {
-            loadMoreBtn.classList.add("is-hidden");
             iziToast.info({
                 message: "We're sorry, but you've reached the end of search results.",
             });
+            hideLoadMoreButton();
         } else {
-            loadMoreBtn.classList.remove("is-hidden");
+            showLoadMoreButton();
         }
 
         if (page > 1) {
